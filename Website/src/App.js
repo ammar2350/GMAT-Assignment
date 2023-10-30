@@ -1,13 +1,10 @@
-import Profile from "./components/profile";
 import Map from "./components/map";
 import { io } from "socket.io-client";
-import react, { useEffect, useState } from 'react';
+import react, { useEffect, useState } from "react";
 import Gyroscope from "./components/gyroscope";
 import Plot1data from "./components/plot1data";
-import MyButton from "./components/myButton";
 
 function App() {
-
   // const [message, setMessage] = useState(null);
   const [gpsLatitude, setGpsLatitude] = useState(null);
   const [gpsLongitude, setGpsLongitude] = useState(null);
@@ -23,18 +20,19 @@ function App() {
     altitude: [],
     clock: [],
   });
+  const [idTeam, setIdTeam] = useState(null);
 
   useEffect(() => {
     const socket = io("https://gmat.haikalhilmi.my.id/");
     socket.on("connect", () => {
       console.log("Connected to Socket.IO server");
     });
-  
+
     const intervalId = setInterval(() => {
       socket.on("message", (mess) => {
-        const parts = mess.split(',');
-  
-        if (parts.length === 10 && mess.endsWith(';')) {
+        const parts = mess.split(",");
+
+        if (parts.length === 10 && mess.endsWith(";")) {
           const team_id = parts[0];
           const clock = parts[1];
           const yaw = parseFloat(parts[2]);
@@ -44,7 +42,8 @@ function App() {
           const gps_longitude = parts[6];
           const voltage = parseFloat(parts[7]);
           const pressure = parseFloat(parts[8]);
-          const altitude = parseFloat(parts[9].slice(0, -1));;
+          const altitude = parseFloat(parts[9].slice(0, -1));
+          setIdTeam(team_id);
           setGpsLatitude(gps_latitude);
           setGpsLongitude(gps_longitude);
           setGraphData((prevData) => {
@@ -71,62 +70,72 @@ function App() {
               clock: updatedClock,
             };
           });
-  
-          console.log("Team_ID:", team_id);
-          console.log("Clock:", clock);
-          console.log("Yaw:", yaw);
-          console.log("Pitch:", pitch);
-          console.log("Roll:", roll);
-          console.log("GPS_Latitude:", gps_latitude);
-          console.log("GPS_Longitude:", gps_longitude);
-          console.log("Voltage:", voltage);
-          console.log("Pressure:", pressure);
-          console.log("Altitude:", altitude);
         }
       });
     }, 1000);
-  
+
     return () => {
       clearInterval(intervalId);
     };
   }, []);
-  
 
   return (
     <body>
-      <div class="grid gap-4 p-4 flex h-screen" >
-        <section class="flex justify-between">
-          <Profile nama="Muflikhul Ammar" nim="22/503386/PA/21630" />
-          <MyButton />
-        </section>
-        <section className="grid gap-4 md:grid-cols-2 sm:grid-cols-1">
-          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/6.5] p-4 rounded-lg">
+      <div class="grid flex h-screen">
+        <nav class="h-17 bg-[#ADC2A9] hover:bg-[#99A799] p-4 shadow-md shadow-slate-600">
+          <div class="mx-auto flex justify-between items-center">
+          <a href="" class="text-2xl font-bold text-white flex items-center">
+            <img src="logo.png" alt="Logo" class="h-10 w-auto" />
+            <span class="ml-2">GADJAH MADA AEROSPACE TEAM</span>
+        </a>
+              <ul class="flex space-x-4">
+                  <span class="text-xl text-white font-semibold">ID Team: {idTeam}</span>
+              </ul>
+          </div>
+        </nav>
+        <div className="h-full grid gap-4 lg:grid-cols-2 p-3">
+          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/6.5] p-4 rounded-lg shadow-md shadow-slate-600">
             <p class="font-bold">GPS</p>
-              <Map
-                className="w-full rounded-lg"
-                latitude={gpsLatitude || 0}
-                longitude={gpsLongitude || 0}
-              />
+            <Map
+              className="w-full rounded-lg"
+              latitude={gpsLatitude || 0}
+              longitude={gpsLongitude || 0}
+            />
           </div>
-          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/6.5] p-4 rounded-lg">
+          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/6.5] p-4 rounded-lg shadow-md shadow-slate-600">
             <p class="font-bold">GYROSCOPE</p>
-            <Gyroscope data={graphData}/>
+            <Gyroscope data={graphData} />
           </div>
-        </section>
-        <section className="grid gap-4 md:grid-cols-3 items-center md:text-left">
-          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/8] p-4 rounded-lg">
+        </div>
+        <div className="grid gap-4 lg:grid-cols-3 p-3">
+          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/8] p-4 rounded-lg shadow-md shadow-slate-600">
             <p class="font-bold">VOLTAGE</p>
-            <Plot1data title ="VOLTAGE" data1={graphData1.clock} data2={graphData1.voltage} yaxis='Voltage'/>
+            <Plot1data
+              title="VOLTAGE"
+              data1={graphData1.clock}
+              data2={graphData1.voltage}
+              yaxis="Voltage"
+            />
           </div>
-          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/8] p-4 rounded-lg">
+          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/8] p-4 rounded-lg shadow-md shadow-slate-600">
             <p class="font-bold">PRESSURE</p>
-            <Plot1data title ="PRESSURE" data1={graphData1.clock} data2={graphData1.pressure} yaxis='Pressure'/>
+            <Plot1data
+              title="PRESSURE"
+              data1={graphData1.clock}
+              data2={graphData1.pressure}
+              yaxis="Pressure"
+            />
           </div>
-          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/8] p-4 rounded-lg">
+          <div class="bg-[#ADC2A9] hover:bg-[#99A799] aspect-[16/8] p-4 rounded-lg shadow-md shadow-slate-600">
             <p class="font-bold">ALTITUDE</p>
-            <Plot1data title ="ALTITUDE" data1={graphData1.clock} data2={graphData1.altitude} yaxis='Altitude'/>
+            <Plot1data
+              title="ALTITUDE"
+              data1={graphData1.clock}
+              data2={graphData1.altitude}
+              yaxis="Altitude"
+            />
           </div>
-        </section>
+        </div>
       </div>
     </body>
   );
